@@ -1,11 +1,21 @@
 package com.paymybudy.model;
 
-public class Client {
+import jakarta.persistence.*;
 
+@Entity
+@Table(name="client")
+public class Client {
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="CLIENT_ID")
     int client_id;
+    @Column(name="FIRSTNAME")
     String firstName;
+    @Column(name="LASTNAME")
     String lastName;
+    @Column(name="EMAIL")
     String email;
+    @Column(name="PASSWORD")
     String password;
 
     public Client() {    }

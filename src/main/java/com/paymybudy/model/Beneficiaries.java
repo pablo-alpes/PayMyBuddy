@@ -1,11 +1,37 @@
 package com.paymybudy.model;
 
-public class Beneficiaries {
-    private int beneficiary_id;
-    private int client_id;
+import jakarta.persistence.*;
+import org.hibernate.annotations.JoinColumnOrFormula;
 
+@Entity
+@Table(name="beneficiaries")
+public class Beneficiaries {
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="BENEFICIARY_ID")
+    /*@OneToMany(
+            cascade  = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    @JoinTable(
+            name = "beneficiaries_name",
+            joinColumns = @JoinColumn(name = "beneficiary_ID"),
+            inverseJoinColumns = @JoinColumn(name = "beneficiary_firstName")
+    )
+    */
+
+    private int beneficiary_id;
+    @Column(name="CLIENT_ID")
+    private int client_id;
+    @Column(name="BENEFICIARY_FIRSTNAME")
     String beneficiary_firstName;
+    @Column(name="BENEFICIARY_LASTNAME")
     String beneficiary_lastName;
+    @Column(name="IBAN")
+    String iban;
+    @Column(name="SWIFT")
+    String swift;
 
     public Beneficiaries() {
     }
@@ -47,5 +73,21 @@ public class Beneficiaries {
 
     public void setBeneficiary_lastName(String beneficiary_lastName) {
         this.beneficiary_lastName = beneficiary_lastName;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
+    }
+
+    public String getSwift() {
+        return swift;
+    }
+
+    public void setSwift(String swift) {
+        this.swift = swift;
     }
 }

@@ -1,14 +1,28 @@
 package com.paymybudy.model;
 
+import jakarta.persistence.*;
+
 import java.util.Date;
 
+@Entity
+@Table(name="transactions")
 public class Transactions {
 
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="TRANSACTION_ID")
     private int transaction_id;
+    @Column(name="CLIENT_ID")
     private int client_id;
+    @Column(name="BENEFICIARY_ID")
+    private int beneficiary_id;
+    @Column(name="AMOUNT")
     private double amount;
+    @Column(name="DESCRIPTION")
     private String description;
+    @Column(name="DATE")
     private Date date;
+    @Column(name="STATUS")
     private int status;
 
     public Transactions() {
@@ -21,6 +35,13 @@ public class Transactions {
         this.description = description;
     }
 
+    public int getBeneficiary_id() {
+        return beneficiary_id;
+    }
+
+    public void setBeneficiary_id(int beneficiary_id) {
+        this.beneficiary_id = beneficiary_id;
+    }
 
     public Date getDate() {
         return date;

@@ -2,6 +2,7 @@ package com.paymybudy.constants;
 
 
 //TODO--To review if this approach can be substituted with Spring JPA
+//Comment: This approach can be partially substitued by Spring JPA.
 public class DBQueries {
     //CREATE
     public static final String INSERT_CLIENT  = "INSERT INTO CLIENT (FIRSTNAME, LASTNAME, EMAIL, PASSWORD) VALUES (?, ?, ?, ?)";
