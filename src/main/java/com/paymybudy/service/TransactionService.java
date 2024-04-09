@@ -22,7 +22,6 @@ public class TransactionService {
 
     public Iterable<Transactions> getTransactionHistoryByClientId(int clientId) {
         return transactionRepository.findByClient_idInOrderByDateDesc(clientId);
-        //return transactionRepository.findById(accountId);
     }
 
     public void rollbackTransaction(int transactionId) {

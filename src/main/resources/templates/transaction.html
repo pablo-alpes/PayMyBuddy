@@ -41,20 +41,23 @@
 </div>
 </nav>
     <div class="collapse navbar-collapse" id="navbarNav"><ul class="nav"><li class="nav-item active"></li></ul></div>
-</nav><div class="container"><h3>Welcome &lt;client_firstName&gt;!</h3></div>
+</nav><div class="container">
+    <!-- Adding Name of the Client and Balance Available in its account -->
+    <h3 th:text="'Welcome '+ ${clientFirstName}">client_firstName</h3>
+    <div class="alert alert-success" role="alert"><span th:text=" 'Your balance available:' + ${balance} + '€'"><strong>{client_balance}</strong></span></div>
+</div>
 <div class="container mt-5">
     <div class="row"><div class="col-12">
         <h5 class="card-title">Send Money</h5>
-        <button class="btn btn-primary float-right" type="button">Add Connection</button>
+        <a class="btn btn-primary float-right" role="button" href="/newconnection">Add Connection</a>
         <div class="card" style="min-width: auto;"></div>
         <div class="card"><div class="card-body" style="text-align: center;">
             <label>
                 <select style="text-align: center;padding: 2px;margin: 15px;" name="beneficiary">
-                    <optgroup label="This is a group">
-                        <option value="12" selected="">Select a connection</option>
-                        <option value="13">This is item 2</option>
-                        <option value="14">This is item 3</option>
-                    </optgroup>
+                    <option value="0">Select a connection</option>
+                    <!-- Adding a list of beneficiaries for the corresponding client -->
+                    <!-- Solution in :www.baeldung.com/thymeleaf-select-option -->
+                    <option th:each="beneficiary : ${beneficiaries}" th:value="${beneficiary}" th:text="${beneficiary}">Beneficiary 1</option>
                 </select>
             </label>
             <label>
@@ -76,10 +79,11 @@
             </thead>
             <tbody>
                 <tr th:each="transaction : ${transactions}">
+                    <!-- the variable is the attribute set in the class -->
                     <td th:text="${transaction.date}">Date</td>
-                    <td th:text="${transaction.beneficiary_id}">Beneficiary_firstName</td>
+                    <td th:text="${transaction.beneficiaryName}">Beneficiary_firstName</td>
                     <td th:text="${transaction.description}">Description</td>
-                    <td th:text="${transaction.amount}">Amount</td>
+                    <td th:text="${transaction.amount } + '€'">Amount</td>
                 </tr>
             </tbody>
         </table>

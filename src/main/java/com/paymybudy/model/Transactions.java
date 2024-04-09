@@ -1,46 +1,89 @@
 package com.paymybudy.model;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
+import org.hibernate.annotations.ManyToAny;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="transactions")
+@Transactional
 public class Transactions {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="TRANSACTION_ID")
-    private int transaction_id;
-    @Column(name="CLIENT_ID")
-    private int client_id;
-    @Column(name="BENEFICIARY_ID")
-    private int beneficiary_id;
-    @Column(name="AMOUNT")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "TRANSACTION_ID")
+    private int transactionId;
+    @Column(name = "CLIENT_ID")
+    private int clientId;
+    @Column(name = "BENEFICIARY_ID")
+    private int beneficiaryId;
+    @Column(name = "AMOUNT")
     private double amount;
-    @Column(name="DESCRIPTION")
+    @Column(name = "DESCRIPTION")
     private String description;
-    @Column(name="DATE")
+    @Column(name = "DATE")
     private Date date;
-    @Column(name="STATUS")
+    @Column(name = "STATUS")
     private int status;
+    @Column(name = "beneficiary_firstname") //the name of the joined column needs to be included in the model
+    private String beneficiaryName;
 
     public Transactions() {
     }
 
-    public Transactions(int transaction_id, int client_id, double amount, String description) {
-        this.transaction_id = transaction_id;
-        this.client_id = client_id;
+    public Transactions(int transactionId, int clientId, int beneficiaryId, double amount, String description, Date date, int status, String beneficiaryName) {
+        this.transactionId = transactionId;
+        this.clientId = clientId;
+        this.beneficiaryId = beneficiaryId;
         this.amount = amount;
         this.description = description;
+        this.date = date;
+        this.status = status;
+        this.beneficiaryName = beneficiaryName;
     }
 
-    public int getBeneficiary_id() {
-        return beneficiary_id;
+    public int getTransactionId() {
+        return transactionId;
     }
 
-    public void setBeneficiary_id(int beneficiary_id) {
-        this.beneficiary_id = beneficiary_id;
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public int getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
+    }
+
+    public int getBeneficiaryId() {
+        return beneficiaryId;
+    }
+
+    public void setBeneficiaryId(int beneficiaryId) {
+        this.beneficiaryId = beneficiaryId;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Date getDate() {
@@ -59,35 +102,12 @@ public class Transactions {
         this.status = status;
     }
 
-    public int getTransaction_id() {
-        return transaction_id;
+    public String getBeneficiaryName() {
+        return beneficiaryName;
     }
 
-    public void setTransaction_id(int transaction_id) {
-        this.transaction_id = transaction_id;
-    }
-
-    public int getClient_id() {
-        return client_id;
-    }
-
-    public void setClient_id(int client_id) {
-        this.client_id = client_id;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setBeneficiaryName(String beneficiaryName) {
+        this.beneficiaryName = beneficiaryName;
     }
 }
+

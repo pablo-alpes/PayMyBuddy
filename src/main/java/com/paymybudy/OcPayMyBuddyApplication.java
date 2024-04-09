@@ -12,6 +12,7 @@
 package com.paymybudy;
 
 import com.paymybudy.service.TransactionService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,10 +26,6 @@ public class OcPayMyBuddyApplication {
     public static void main(String[] args) throws SQLException {
 
         SpringApplication.run(OcPayMyBuddyApplication.class, args);
-
-        //DB CONNECTION
-        //DatabaseConfig databaseConfig = new DatabaseConfig();
-        //Connection conn = databaseConfig.getConnection();
 
         //Runs the sql script to initialize mock values in the DB
         //ScriptUtils.executeSqlScript(conn, new ClassPathResource(Constants.INITIALIZER));

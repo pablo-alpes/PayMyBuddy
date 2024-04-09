@@ -21,7 +21,7 @@ public interface TransactionRepository extends CrudRepository<Transactions, Inte
     }
     */
 
-    @Query(value = "SELECT * FROM Transactions t WHERE t.client_id = ?1 ORDER BY t.date DESC", nativeQuery = true)
+    @Query(value = "select t.transaction_id, t.client_id, t.beneficiary_id, t.amount, t.description, t.date, beneficiaries.beneficiary_firstname, t.status from transactions t LEFT JOIN beneficiaries ON beneficiaries.client_id = t.client_id;", nativeQuery = true)
         //the query asks the DB for all the lines matching the criteria = ?1
-    Iterable<Transactions> findByClient_idInOrderByDateDesc(int client_id);
+    Iterable<Transactions> findByClient_idInOrderByDateDesc(int clientId);
 }
