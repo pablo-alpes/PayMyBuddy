@@ -45,26 +45,39 @@
     <!-- Adding Name of the Client and Balance Available in its account -->
     <h3 th:text="'Welcome '+ ${clientFirstName}">client_firstName</h3>
     <div class="alert alert-success" role="alert"><span th:text=" 'Your balance available:' + ${balance} + '€'"><strong>{client_balance}</strong></span></div>
+    <h4 th:text="${message}"></h4>
 </div>
 <div class="container mt-5">
     <div class="row"><div class="col-12">
+        <form
+                th:action="@{/transactions}"
+                th:object="${payment}"
+                th:method="post"
+                method="post"
+        >
         <h5 class="card-title">Send Money</h5>
         <a class="btn btn-primary float-right" role="button" href="/newconnection">Add Connection</a>
         <div class="card" style="min-width: auto;"></div>
         <div class="card"><div class="card-body" style="text-align: center;">
             <label>
-                <select style="text-align: center;padding: 2px;margin: 15px;" name="beneficiary">
-                    <option value="0">Select a connection</option>
+                <select
+                        th:field="*{beneficiaryName}"
+                        style="text-align: center;padding: 2px;margin: 15px;" name="beneficiary">
                     <!-- Adding a list of beneficiaries for the corresponding client -->
-                    <!-- Solution in :www.baeldung.com/thymeleaf-select-option -->
-                    <option th:each="beneficiary : ${beneficiaries}" th:value="${beneficiary}" th:text="${beneficiary}">Beneficiary 1</option>
+                    <!-- Solution in: www.baeldung.com/thymeleaf-select-option -->
+                    <option
+                            th:each="beneficiary : ${beneficiaries}"
+                            th:text="${beneficiary}"
+                            th:value="${beneficiary}">
+                    </option>
                 </select>
             </label>
             <label>
-                <input type="number" style="text-align: right;padding: 1px 2px;margin: 15px;" placeholder="0€" step="1" min="0" value="€">
+                <input th:field="*{amount}" type="number" style="text-align: right;padding: 1px 2px;margin: 15px;" placeholder="0€" step="1" min="0" value="€">
             </label>
             <button class="btn btn-success" type="submit" style="text-align: center;margin: 15px;width: 154.2969px;">Pay</button>
 </div></div>
+        </form>
     <h5>My transactions</h5>
     <div class="card mt-3"><div class="card-body">
     <div class="table-responsive">

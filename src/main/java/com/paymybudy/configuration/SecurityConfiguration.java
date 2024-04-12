@@ -33,7 +33,8 @@ public class SecurityConfiguration {
     //https://www.baeldung.com/spring-security-configuring-urls
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        //http.antMatcher("/**").authorizeRequest().anyRequest().authenticated();
         http
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -44,9 +45,10 @@ public class SecurityConfiguration {
         //remember me : https://docs.spring.io/spring-security/reference/servlet/authentication/rememberme.html
 
         return http
-                .authorizeHttpRequests((authorize) -> authorize
-                        .anyRequest().authenticated())
-                .build();
+                .csrf().disable() // allowed testing
+                .authorizeHttpRequests()
+                        .anyRequest().authenticated()
+                .and().build();
                 /**.authorizeHttpRequests(request -> request.requestMatchers(new AntPathRequestMatcher("/"))
                         .permitAll())
                 .authorizeHttpRequests(request -> request.requestMatchers(new AntPathRequestMatcher("/newconnection", "GET"))

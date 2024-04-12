@@ -19,17 +19,20 @@ public class Beneficiaries {
     String iban;
     @Column(name = "SWIFT")
     String swift;
+    @Column(name = "EMAIL")
+    String email;
 
     public Beneficiaries() {
     }
 
-    public Beneficiaries(int beneficiaryId, int clientId, String beneficiaryFirstName, String beneficiaryLastName, String iban, String swift) {
+    public Beneficiaries(int beneficiaryId, int clientId, String beneficiaryFirstName, String beneficiaryLastName, String iban, String swift, String email) {
         this.beneficiaryId = beneficiaryId;
         this.clientId = clientId;
         this.beneficiaryFirstName = beneficiaryFirstName;
         this.beneficiaryLastName = beneficiaryLastName;
         this.iban = iban;
         this.swift = swift;
+        this.email = email;
     }
 
     public int getBeneficiaryId() {
@@ -78,5 +81,13 @@ public class Beneficiaries {
 
     public void setSwift(String swift) {
         this.swift = swift;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

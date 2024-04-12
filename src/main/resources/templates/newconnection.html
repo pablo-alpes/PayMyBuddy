@@ -46,21 +46,26 @@
                 <div class="col">
                     <form
                             th:action="@{/newconnection}"
-                            th:object="${beneficiary}"
+                            th:object="${beneficiaryAddForm}"
                             th:method="post"
                             method="post"
-                            class="text-center custom-form"><h1 class="fs-3" style="text-align: left;"
-                    >
+                            class="text-center custom-form"><h1 class="fs-3" style="text-align: left;">
                         <!-- load beneficiaries to the template, excluding the ones he has already -->
-                        <span style="color: rgb(0, 0, 0);">Add New Connection</span></h1><sub class="text-start">Choose a
-                        connection existing in our Database</sub><select class="form-select"
-                                                                         style="text-align: center;padding: 2px;margin: 15px;"
-                                                                         value="Select a connection" name="beneficiary">
-                        <optgroup label="This is a group">
-                            <option value="12" selected="">Select a connection</option>
-                            <option value="13">This is item 2</option>
-                        </optgroup>
-                    </select>
+                        <span style="color: rgb(0, 0, 0);">Add New Connection</span></h1>
+                        <sub class="text-start">Choose a connection existing in our Database</sub>
+                        <!-- form-select by default -->
+                        <select
+                                th:field="*{selectedEmail}"
+                                style="text-align: center;padding: 2px;margin: 15px;" name="beneficiary">
+                            <!-- Adding a list of beneficiaries already registered in the database and not already there -->
+                            <!-- Solution in: www.baeldung.com/thymeleaf-select-option -->
+                            <option value=""></option>
+                            <option value=""
+                                    th:each="emailIndividual : ${beneficiaryEmail}"
+                                    th:text="${emailIndividual}"
+                                    th:value="${emailIndividual}">
+                            </option>
+                        </select>
                         <figure>
                             <blockquote class="blockquote"><p class="mb-0"></p></blockquote>
                             <figcaption class="blockquote-footer"></figcaption>
@@ -70,24 +75,30 @@
                             <div class="col-sm-4 label-column">
                                 <label>First Name </label></div>
                             <div class="col-sm-6 input-column">
-                                <input class="form-control" type="text" th:field="*{beneficiaryFirstName}"></div>
+                                <input class="form-control" type="text" th:field="*{beneficiaries.beneficiaryFirstName}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col-sm-4 label-column"><label>Last Name</label></div>
                             <div class="col-sm-6 input-column">
-                                <input class="form-control" type="text" th:field="*{beneficiaryLastName}"></div>
+                                <input class="form-control" type="text" th:field="*{beneficiaries.beneficiaryLastName}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col-sm-4 label-column"><label>IBAN</label>
                             </div>
                             <div class="col-sm-6 input-column">
-                                <input class="form-control" type="text" th:field="*{iban}"></div>
+                                <input class="form-control" type="text" th:field="*{beneficiaries.iban}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col-sm-4 label-column"><label>SWIFT</label>
                             </div>
                             <div class="col-sm-6 input-column">
-                                <input class="form-control" type="text" th:field="*{swift}"></div>
+                                <input class="form-control" type="text" th:field="*{beneficiaries.swift}"></div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-4 label-column"><label>Email</label>
+                            </div>
+                            <div class="col-sm-6 input-column">
+                                <input class="form-control" type="text" th:field="*{beneficiaries.email}"></div>
                         </div>
                         <button type="submit" class="btn btn-primary d-block w-100"  style="text-align: center;">Add New Connection</button>
                     </form>

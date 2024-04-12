@@ -20,10 +20,13 @@ public class Accounts {
 
     public Accounts() {
     }
-    public Accounts(int account_ID, int client_ID, float balance) {
+
+    public Accounts(int account_ID, int client_ID, float balance, String iban, String swift) {
         this.account_ID = account_ID;
         this.client_ID = client_ID;
         this.balance = balance;
+        this.iban = iban;
+        this.swift = swift;
     }
 
     public int getAccount_ID() {

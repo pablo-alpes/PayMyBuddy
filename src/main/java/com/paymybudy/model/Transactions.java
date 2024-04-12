@@ -22,7 +22,7 @@ public class Transactions {
     @Column(name = "BENEFICIARY_ID")
     private int beneficiaryId;
     @Column(name = "AMOUNT")
-    private double amount;
+    private float amount;
     @Column(name = "DESCRIPTION")
     private String description;
     @Column(name = "DATE")
@@ -35,7 +35,7 @@ public class Transactions {
     public Transactions() {
     }
 
-    public Transactions(int transactionId, int clientId, int beneficiaryId, double amount, String description, Date date, int status, String beneficiaryName) {
+    public Transactions(int transactionId, int clientId, int beneficiaryId, float amount, String description, Date date, int status, String beneficiaryName) {
         this.transactionId = transactionId;
         this.clientId = clientId;
         this.beneficiaryId = beneficiaryId;
@@ -70,11 +70,11 @@ public class Transactions {
         this.beneficiaryId = beneficiaryId;
     }
 
-    public double getAmount() {
+    public float getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(float amount) {
         this.amount = amount;
     }
 
