@@ -4,10 +4,13 @@ import com.paymybudy.model.Beneficiaries;
 import com.paymybudy.model.Transactions;
 import com.paymybudy.repository.BeneficiariesRepository;
 import com.paymybudy.repository.BeneficiaryAddFormDTO;
+import com.paymybudy.repository.RegistrationAddFormDTO;
 import com.paymybudy.service.BeneficiaryService;
 import com.paymybudy.service.ClientIdentificationService;
 import com.paymybudy.service.LoginService;
 import com.paymybudy.service.TransactionService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +41,16 @@ public class TransactionsController {
     private BeneficiaryAddFormDTO beneficiaryAddForm;
 
     @GetMapping(value = "/transactions")
-    public ModelAndView getTransactions(Model model) {
+    @ResponseBody //response body is needed to get the parameters
+    public ModelAndView getTransactions(
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "1") int pageNumber,
+            @RequestParam(value = "size", required = false, defaultValue = "3") int size,
+            Model model) {
         //Doc: https://www.baeldung.com/get-user-in-spring-securit
         //Client login
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("username", auth.getPrincipal());
+
         int clientID = loginService.emailToIdCurrentUser();
         Iterable<Transactions> transactions = transactionService.getTransactionHistoryByClientId(clientID);
 
@@ -52,12 +62,11 @@ public class TransactionsController {
 
         ModelAndView mv = new ModelAndView();
         mv.setViewName("transaction");
-        mv.getModel().put("transactions", transactions); ///mv.addAttribute("transactions", transactions), same but checks for null
+        mv.getModel().put("transactions", transactionService.getTransactionsList(pageNumber, size, clientID)); ///mv.addAttribute("transactions", transactions), same but checks for null
         mv.getModel().put("clientFirstName", clientFirstName);
         mv.getModel().put("beneficiaries", beneficiaryFirstName);
         mv.getModel().put("balance", balance);
 
-        //TODO -- Check if this object is retrieving the right information
         //ensure submission of transaction beneficiary key meets constraint
         //do search beneficiaryId by beneficiary name selected
         mv.getModel().put("payment", new Transactions()); //sends submit info to the PostMapping
@@ -70,6 +79,9 @@ public class TransactionsController {
 
     @GetMapping("/login")
     public String login(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("username", auth.getPrincipal());
+
         return "login";
     }
 
@@ -90,11 +102,10 @@ public class TransactionsController {
     }
 
     @PostMapping("/newconnection")
-    public void newBeneficiaryInput(@ModelAttribute BeneficiaryAddFormDTO beneficiaryAddForm, Model model) throws NullPointerException {
+    public String newBeneficiaryInput(@ModelAttribute BeneficiaryAddFormDTO beneficiaryAddForm, Model model) throws NullPointerException {
         //storages the information obtained in the Form to the DB
+
         //if user input
-        // TODO
-        //  -To distinguish between input in the dropbox versus manual input : "email" is collecting the both values
         int clientID = loginService.emailToIdCurrentUser();
         model.addAttribute("beneficiaryAddForm", beneficiaryAddForm);
 
@@ -120,7 +131,7 @@ public class TransactionsController {
             }
             model.addAttribute("message", "Registration of new connection has been successful.");
         }
-   //     return "transaction";
+        return "transaction";
     }
     @PostMapping("/transactions")
     public ModelAndView doTransfer(@ModelAttribute Transactions payment, Model model) {
@@ -134,8 +145,15 @@ public class TransactionsController {
         payment.setClientId(clientID);
 
         if (transactionService.doTransfer(payment) == 0) model.addAttribute("message","Not enough funds to perform the transaction.");
-        return getTransactions(model);
+        return getTransactions(1, 3, model);
     }
+
+    /*@PostMapping("/registration")
+    public String registration(@ModelAttribute RegistrationAddFormDTO newClient, Model model) {
+        model.addAttribute("client", newClient);
+        return "registration";
+    }
+     */
 
 }
 

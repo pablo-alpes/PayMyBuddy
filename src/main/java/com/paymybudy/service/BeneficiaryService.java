@@ -14,7 +14,9 @@ public class BeneficiaryService {
 
     public BeneficiaryService(BeneficiariesRepository beneficiariesRepository) {
         this.beneficiariesRepository = beneficiariesRepository;
-    } // to confirm spec on what key to use to retrieve them
+    }
+
+
     public void addBeneficiary(int clientID, String firstName, String lastName, String iban, String swift, String email) {
         //Rules : An unique mail for the key firstName-lastName is accepted
         if (TimesBeneficiaryForClientID(clientID, email)==0) { //checks if no duplication of beneficiary record

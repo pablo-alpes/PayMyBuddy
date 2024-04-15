@@ -13,18 +13,23 @@ public class Client {
     String firstName;
     @Column(name="LASTNAME")
     String lastName;
-    @Column(name="EMAIL")
+    @Column(name="EMAIL", unique = true)
     String email;
     @Column(name="PASSWORD")
     String password;
+    @Column(name="ROLE")
+    String role;
 
-    public Client() {    }
-    public Client(int client_id, String firstName, String lastName, String email, String password) {
+    public Client() {
+    }
+
+    public Client(int client_id, String firstName, String lastName, String email, String password, String role) {
         this.client_id = client_id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     public int getClient_id() {
@@ -65,5 +70,13 @@ public class Client {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

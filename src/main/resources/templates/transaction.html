@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Pay My Buddy</title>
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css"><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/Features-Image-images.css">
     <link rel="stylesheet" href="assets/css/Navbar-Right-Links-icons.css">
 </head>
@@ -36,7 +37,7 @@
             <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
         </ul>
-        <a class="btn btn-primary ms-md-2" role="button" href="#">Log off</a>
+        <a class="btn btn-primary ms-md-2" role="button" href="logout">Log off</a>
     </div>
 </div>
 </nav>
@@ -91,12 +92,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="transaction : ${transactions}">
+                <tr th:each="transaction : ${transactions.page.content}">
                     <!-- the variable is the attribute set in the class -->
                     <td th:text="${transaction.date}">Date</td>
                     <td th:text="${transaction.beneficiaryName}">Beneficiary_firstName</td>
                     <td th:text="${transaction.description}">Description</td>
-                    <td th:text="${transaction.amount } + '€'">Amount</td>
+                    <td th:text="${transaction.amount} + '€'">Amount</td>
                 </tr>
             </tbody>
         </table>
@@ -110,16 +111,36 @@
             <tbody></tbody>
         </table>
     </div>
-    <nav aria-label="...">
-        <ul class="pagination pagination-sm">
-            <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true" tabindex="-1">Previous</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-        </ul>
-    </nav>
+        <nav aria-label="Page navigation" class="paging">
+            <ul class="pagination" th:if="${transactions.page.totalPages > 1}">
+                <li class="page-item" th:classappend="${!transactions.paging.isPrevEnabled()? 'enabled' : ''}">
+                    <a class="page-link" th:href="@{'/transactions?pageNumber=' + ${transactions.paging.pageNumber - 1}}"
+                       tabindex="-1">Previous</a>
+                </li>
+                <th:block th:each="item : ${transactions.paging.getItems()}">
+                    <li class="page-item" th:classappend="${item.index == transactions.paging.pageNumber? 'active' : ''}"
+                        th:if="${item.pageItemType.name() == 'PAGE'}">
+                        <a class="page-link" th:href="@{'/transactions?pageNumber=' + ${item.index}}"
+                           th:text="${item.index}"></a>
+                    </li>
+                    <li class="page-item disabled" th:if="${item.pageItemType.name() == 'DOTS'}">
+                        <a class="page-link" href="#">...</a>
+                    </li>
+                </th:block>
+                <li class="page-item" th:classappend="${!transactions.paging.isNextEnabled()? 'enabled' : ''}">
+                    <a class="page-link" th:href="@{'/transactions?pageNumber=' + ${transactions.paging.pageNumber + 1}}">Next</a>
+                </li>
+            </ul>
+        </nav>
+
 </div></div></div></div></div>
 <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+
 </body>
 </html>
