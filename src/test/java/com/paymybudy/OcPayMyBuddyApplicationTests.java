@@ -5,10 +5,7 @@ import com.paymybudy.model.Beneficiaries;
 import com.paymybudy.model.Client;
 import com.paymybudy.model.Transactions;
 import com.paymybudy.repository.*;
-import com.paymybudy.service.AccountCreationService;
-import com.paymybudy.service.BalanceService;
-import com.paymybudy.service.BeneficiaryService;
-import com.paymybudy.service.ClientUserDetailsService;
+import com.paymybudy.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,6 +52,9 @@ class OcPayMyBuddyApplicationTests {
 
     @Autowired
     private AccountCreationService accountCreationService;
+
+    @Autowired
+    private TransactionService transactionService;
     @Mock
     private BeneficiaryAddFormDTO beneficiaryAddFormDTO;
 
@@ -440,6 +440,98 @@ class OcPayMyBuddyApplicationTests {
         accountCreationService.createAccount("email@test.com", account.getIban(), account.getSwift()); // creates the account
         //accountCreationService.createAccount("test", account.getIban(), account.getSwift()); // creates the account
     }
+    @Test
+    @DisplayName("GET - Bank transactions")
+    @WithMockUser(username = "user", roles = {"ADMIN"})
+    void test_DepositAccount_UP() throws Exception {
+            this.mockMvc
+                    .perform(get("/bank"))
+                    .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST - Deposit to account")
+    @WithMockUser(username = "user", roles = {"ADMIN"})
+        // by default 'user'
+    void test_DepositAccount_Post() throws Exception {
+        this.mockMvc
+                .perform(post("/balance")
+                        .param("deposit", "1000"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attributeExists("bank"));
+    }
+
+    @Test
+    @DisplayName("POST - Withdraw from account")
+    @WithMockUser(username = "user", roles = {"ADMIN"})
+        // by default 'user'
+    void test_Withdraw_Post() throws Exception {
+        this.mockMvc
+                .perform(post("/withdraw")
+                        .param("withdraw", "1000"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attributeExists("bank"));
+    }
+
+    @Test
+    void test_updateBalance() {
+        int clientId = 1; //vient du session actuelle
+
+        float balanceToDeposit = 1000F;
+        float balance = balanceService.getBalance(clientId);
+        float totalOperation = balance + balanceToDeposit;
+
+        //TODO -- Utilisateur: Add the client as beneficiary, otherwise the constraint is not met in the DB
+
+        //Transfer details
+        Transactions transaction = new Transactions();
+        transaction.setClientId(clientId);
+        transaction.setBeneficiaryId(1);  // le beneficiare doit etre enregistré en amont dans la liste de beneficiaries
+        transaction.setDate(new Date(124, Calendar.MAY, 8, 14, 10, 20));
+        transaction.setAmount(balanceToDeposit);
+        transaction.setDescription("Credit deposit from User");
+        transaction.setStatus(1);
+        transaction.setBeneficiaryName("Client USER");
+
+        //ACTION
+        balanceService.updateBalance(clientId, totalOperation);
+
+        Transactions savedTransaction = transactionRepository.save(transaction);
+        //transactionService.receiveDeposit(transaction); //transaction doit se compter, funds check is not needed for the account
+
+        //ASSERT
+        assertNotEquals(savedTransaction.getTransactionId(), 0);
+    }
+
+
+    @Test
+    void test_withdrawExecution() {
+        int clientId = 1; //vient du session actuelle
+
+        float withdraw = -1000;
+        float balance = balanceService.getBalance(clientId);
+        float totalOperation = balance + withdraw;
+
+        balanceService.updateBalance(clientId, totalOperation); //on décompte le montant du versement, mettre à jour balance du compte
+
+        //Transfer details
+        Transactions transaction = new Transactions();
+        transaction.setClientId(clientId);
+        transaction.setBeneficiaryId(1); // le beneficiare doit etre enr'egistré en amont dans la liste de beneficiaries
+        transaction.setDate(new Date(124, Calendar.MAY, 8, 14, 10, 20));
+        transaction.setAmount(withdraw);
+        transaction.setDescription("Withdraw from User");
+        transaction.setStatus(1);
+        transaction.setBeneficiaryName("Client USER");
+
+        //ACTION
+        // transaction doit se compter, funds check is needed -> dotransfer needs to tbe used
+        Transactions savedTransaction = transactionRepository.save(transaction);
+
+        //ASSERT
+        assertNotEquals(savedTransaction.getTransactionId(), 0);
+    }
+
 
     /**
      *

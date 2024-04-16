@@ -1,5 +1,6 @@
 package com.paymybudy.service;
 
+import com.paymybudy.model.Client;
 import com.paymybudy.repository.AccountsRepository;
 import com.paymybudy.repository.BeneficiariesRepository;
 import com.paymybudy.repository.ClientRepository;
@@ -40,5 +41,8 @@ public class ClientIdentificationService {
         return accountsRepository.findById(clientId).get().getBalance();
     }
 
+    public String getIbanByClientId(int clientId) {
+        return accountsRepository.findById(clientId).get().getIban();
+    }
 
 }

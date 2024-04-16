@@ -4,6 +4,7 @@ import com.paymybudy.model.Accounts;
 import com.paymybudy.model.Beneficiaries;
 import com.paymybudy.model.Client;
 import com.paymybudy.model.Transactions;
+import com.paymybudy.repository.BankTransaction;
 import com.paymybudy.repository.BeneficiariesRepository;
 import com.paymybudy.repository.BeneficiaryAddFormDTO;
 import com.paymybudy.repository.RegistrationAddFormDTO;
@@ -174,6 +175,34 @@ public class TransactionsController {
         accountCreationService.createAccount(clientDTO.getEmail(), account.getIban(), account.getSwift()); // creates the account, by default balance = 0
 
         return "login";
+    }
+
+    @GetMapping("/bank")
+    public String bankOperations(Model model, @ModelAttribute BankTransaction bank) {
+        int clientID = loginService.emailToIdCurrentUser();
+        float balance = clientIdentificationService.getBalanceById(clientID);
+        String iban = clientIdentificationService.getIbanByClientId(clientID);
+
+        model.addAttribute("iban", iban);
+        model.addAttribute("balance", balance);
+        model.addAttribute("bank", bank);
+        return "bank";
+    }
+
+    @PostMapping("/withdraw")
+    public String doWithdraw(Model model, @ModelAttribute BankTransaction bank, @ModelAttribute Accounts account) {
+        model.addAttribute("bank", bank);
+        //withdraw
+
+        return "bank";
+    }
+
+    @PostMapping("/balance")
+    public String doBalanceUpdate(Model model, @ModelAttribute BankTransaction bank) {
+        model.addAttribute("bank", bank);
+        //update balance
+
+        return "bank";
     }
 
 }
