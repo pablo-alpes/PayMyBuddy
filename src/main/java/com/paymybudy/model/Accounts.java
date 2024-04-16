@@ -10,7 +10,7 @@ public class Accounts {
     @Column(name="ACCOUNT_ID")
     private int account_ID;
     @Column(name="CLIENT_ID")
-    private int client_ID;
+    private int clientId;
     @Column(name="BALANCE")
     float balance;
     @Column(name="IBAN")
@@ -21,9 +21,9 @@ public class Accounts {
     public Accounts() {
     }
 
-    public Accounts(int account_ID, int client_ID, float balance, String iban, String swift) {
+    public Accounts(int account_ID, int clientId, float balance, String iban, String swift) {
         this.account_ID = account_ID;
-        this.client_ID = client_ID;
+        this.clientId = clientId;
         this.balance = balance;
         this.iban = iban;
         this.swift = swift;
@@ -37,12 +37,12 @@ public class Accounts {
         this.account_ID = account_ID;
     }
 
-    public int getClient_ID() {
-        return client_ID;
+    public int getClientId() {
+        return clientId;
     }
 
-    public void setClient_ID(int client_ID) {
-        this.client_ID = client_ID;
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
     }
 
     public float getBalance() {

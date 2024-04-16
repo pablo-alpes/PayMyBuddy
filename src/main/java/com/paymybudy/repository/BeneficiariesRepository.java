@@ -14,16 +14,16 @@ import java.util.Optional;
 
 @Repository
 public interface BeneficiariesRepository  extends CrudRepository<Beneficiaries, Integer> {
-    @Query("select b.beneficiaryFirstName from Beneficiaries b where b.clientId = ?1")
+    @Query(value = "select b.BENEFICIARY_FIRSTNAME from Beneficiaries b where b.client_id = ?1", nativeQuery = true)
     List<String> findByBeneficiary_idIn(int clientId);
 
-    @Query("select b.beneficiaryId from Beneficiaries b where b.clientId = ?1 and b.beneficiaryFirstName = ?2")
+    @Query(value = "select b.beneficiary_id from Beneficiaries b where b.client_id = ?1 and b.BENEFICIARY_FIRSTNAME = ?2", nativeQuery = true)
     int getBeneficiaryIdFromKeyClientIDAndBeneficiaryFirstName(int clientId, String beneficiaryFirstName);
 
     @Query(value = "select COUNT(distinct beneficiary_id) from beneficiaries where client_id = ?1 and email = ?2", nativeQuery = true)
     int TimesBeneficiaryForClientID(int clientId, String email); //needs to be only 1 as email is only allowed once
 
-    @Query("select b.email from Beneficiaries b where b.clientId <> ?1")
+    @Query(value = "select b.email from Beneficiaries b where b.client_id <> ?1", nativeQuery = true)
     List<String> getBeneficiaryEmailByClientId(int clientId);
 
     @Query(value = "select * from beneficiaries where email = ?1 limit 1", nativeQuery = true)

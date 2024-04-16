@@ -1,33 +1,29 @@
 package com.paymybudy;
 
-import com.paymybudy.controller.TransactionsController;
 import com.paymybudy.model.Accounts;
 import com.paymybudy.model.Beneficiaries;
 import com.paymybudy.model.Client;
 import com.paymybudy.model.Transactions;
 import com.paymybudy.repository.*;
+import com.paymybudy.service.AccountCreationService;
 import com.paymybudy.service.BalanceService;
 import com.paymybudy.service.BeneficiaryService;
 import com.paymybudy.service.ClientUserDetailsService;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.internal.matchers.Any;
-import org.mockito.internal.matchers.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -56,6 +52,9 @@ class OcPayMyBuddyApplicationTests {
 
     @Autowired
     private BeneficiaryService beneficiaryService;
+
+    @Autowired
+    private AccountCreationService accountCreationService;
     @Mock
     private BeneficiaryAddFormDTO beneficiaryAddFormDTO;
 
@@ -118,7 +117,7 @@ class OcPayMyBuddyApplicationTests {
         //ARRANGE
         Accounts account = new Accounts();
         //account setup
-        account.setClient_ID(1);
+        account.setClientId(1);
         account.setBalance(3000.00F);
         account.setIban("CL2500");
         account.setSwift("CCC");
@@ -126,7 +125,7 @@ class OcPayMyBuddyApplicationTests {
         //Transfer details
         Transactions transaction = new Transactions();
 
-        transaction.setClientId(account.getClient_ID());
+        transaction.setClientId(account.getClientId());
         transaction.setBeneficiaryId(5);
         transaction.setAmount(500.00F);
         transaction.setDescription("Epic purchase");
@@ -359,6 +358,87 @@ class OcPayMyBuddyApplicationTests {
         this.mockMvc
                 .perform(get("/error"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("GET - ENDPOINT 6 - Registration")
+    @WithUserDetails
+        // by default 'user'
+    void test_GET_EndPoint6_Registration_UP() throws Exception {
+        this.mockMvc
+                .perform(get("/registration"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST - ENDPOINT 6 - Registration")
+    @WithUserDetails
+        // by default 'user'
+    void test_POST_EndPoint6_Registration_UP() throws Exception {
+        this.mockMvc
+                .perform(post("/registration")
+                        .param("firstName", "test")
+                        .param("lastName", "test")
+                        .param("iban", "FR76TEST")
+                        .param("swift", "CCCTEST")
+                        .param("email", "email@test.com")
+                        .param("password", "passwordTest"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attributeExists("client"));
+    }
+
+    @Test
+    @DisplayName("Input a new user parameters")
+    @WithAnonymousUser
+    void test_GivenRegistrationPageForm_WhenAnAnonymousCompletesRegistrationForm_Then_AccountIsCreatedAndRecordInTheDB() throws Exception {
+        //Given
+        //When
+        MvcResult mvcResult = this.mockMvc
+                .perform(post("/registration")
+                        .param("firstName", "test")
+                        .param("lastName", "test")
+                        .param("iban", "FR76TEST")
+                        .param("swift", "swiftest")
+                        .param("email", "email@test.com")
+                        .param("password", "passwordtest"))
+                .andExpect(status().is3xxRedirection())
+                .andReturn();
+        //Then: Value is well passed to the POST form
+        assertEquals((mvcResult.getRequest().getParameter("email")),"email@test.com");
+    }
+    @Test
+    @DisplayName("Unit test create client")
+    //@WithAnonymousUser
+    void test_creationClient() throws Exception {
+        //Given
+        Client client = new Client();
+
+        //ACT
+        client.setFirstName("test");
+        client.setLastName("test");
+        client.setPassword("test");
+        client.setEmail("email@test.com");
+        client.setRole("USER"); // by default all persons are 'USER' // à intégrer dans la méthode
+        client.setClientId(100);
+
+        accountCreationService.createClient(client); // records the client user
+
+        //ASSERT
+    }
+    @Test
+    @DisplayName("Unit test create account")
+    //@WithAnonymousUser
+    void test_creationAccount() throws Exception {
+        //the person needs to have previously created a client account
+        Accounts account = new Accounts();
+
+        account.setBalance(0); //by default clients do not have money in the account // à intégrer dans la méthode
+        account.setIban("FR76TEST");
+        account.setSwift("swiftest");
+        //la valeur username viendra du wrapper AddFormDTO
+
+        accountCreationService.createAccount("email@test.com", account.getIban(), account.getSwift()); // creates the account
+        //accountCreationService.createAccount("test", account.getIban(), account.getSwift()); // creates the account
     }
 
     /**

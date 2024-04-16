@@ -1,14 +1,13 @@
 package com.paymybudy.controller;
 
+import com.paymybudy.model.Accounts;
 import com.paymybudy.model.Beneficiaries;
+import com.paymybudy.model.Client;
 import com.paymybudy.model.Transactions;
 import com.paymybudy.repository.BeneficiariesRepository;
 import com.paymybudy.repository.BeneficiaryAddFormDTO;
 import com.paymybudy.repository.RegistrationAddFormDTO;
-import com.paymybudy.service.BeneficiaryService;
-import com.paymybudy.service.ClientIdentificationService;
-import com.paymybudy.service.LoginService;
-import com.paymybudy.service.TransactionService;
+import com.paymybudy.service.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
@@ -38,6 +37,9 @@ public class TransactionsController {
 
     @Autowired
     private BeneficiaryService beneficiaryService;
+
+    @Autowired
+    private AccountCreationService accountCreationService;
     private BeneficiaryAddFormDTO beneficiaryAddForm;
 
     @GetMapping(value = "/transactions")
@@ -148,12 +150,31 @@ public class TransactionsController {
         return getTransactions(1, 3, model);
     }
 
-    /*@PostMapping("/registration")
-    public String registration(@ModelAttribute RegistrationAddFormDTO newClient, Model model) {
-        model.addAttribute("client", newClient);
+    @GetMapping("/registration")
+    public String clientRegistration(@ModelAttribute RegistrationAddFormDTO client, Model model) {
+        model.addAttribute("client", client);
         return "registration";
     }
-     */
+
+    @PostMapping("/registration")
+    public String doRegistration(@ModelAttribute RegistrationAddFormDTO clientDTO, Model model) {
+        model.addAttribute("client", clientDTO);
+
+        Client client = new Client();
+        Accounts account = new Accounts();
+
+        client.setFirstName(clientDTO.getFirstName());
+        client.setLastName(clientDTO.getLastName());
+        client.setPassword(clientDTO.getPassword());
+        client.setEmail(clientDTO.getEmail());
+        accountCreationService.createClient(client); // records the client user, by default client ID assigned by DB
+
+        account.setIban(clientDTO.getIban());
+        account.setSwift(clientDTO.getSwift());
+        accountCreationService.createAccount(clientDTO.getEmail(), account.getIban(), account.getSwift()); // creates the account, by default balance = 0
+
+        return "login";
+    }
 
 }
 
