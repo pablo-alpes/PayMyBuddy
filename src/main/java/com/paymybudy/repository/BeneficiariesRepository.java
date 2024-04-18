@@ -30,8 +30,9 @@ public interface BeneficiariesRepository  extends CrudRepository<Beneficiaries, 
     Beneficiaries getBeneficiaryFromEmailAndClientId(String email, int clientId);
 
     // adds a new Beneficiary, so no need of new beneficiary_id
-    @Modifying
+
     @Transactional
+    @Modifying
     @Query(value="INSERT INTO beneficiaries (" +
             "client_id, BENEFICIARY_FIRSTNAME, BENEFICIARY_LASTNAME, IBAN, SWIFT, EMAIL) " +
             "VALUES(:#{#clientId}, :#{#beneficiaries.beneficiaryFirstName}, " +

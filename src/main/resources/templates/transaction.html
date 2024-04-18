@@ -114,7 +114,7 @@
     </div>
         <nav aria-label="Page navigation" class="paging">
             <ul class="pagination" th:if="${transactions.page.totalPages > 1}">
-                <li class="page-item" th:classappend="${!transactions.paging.isPrevEnabled()? 'enabled' : ''}">
+                <li class="page-item" th:classappend="${!transactions.paging.isPrevEnabled()? 'disabled' : ''}">
                     <a class="page-link" th:href="@{'/transactions?pageNumber=' + ${transactions.paging.pageNumber - 1}}"
                        tabindex="-1">Previous</a>
                 </li>
@@ -128,7 +128,7 @@
                         <a class="page-link" href="#">...</a>
                     </li>
                 </th:block>
-                <li class="page-item" th:classappend="${!transactions.paging.isNextEnabled()? 'enabled' : ''}">
+                <li class="page-item" th:classappend="${!transactions.paging.isNextEnabled()? 'disabled' : ''}">
                     <a class="page-link" th:href="@{'/transactions?pageNumber=' + ${transactions.paging.pageNumber + 1}}">Next</a>
                 </li>
             </ul>

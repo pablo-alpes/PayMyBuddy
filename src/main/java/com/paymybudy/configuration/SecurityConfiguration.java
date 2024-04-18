@@ -36,9 +36,11 @@ import static org.springframework.security.authorization.AuthenticatedAuthorizat
 @EnableWebSecurity
 public class SecurityConfiguration {
     //We create a security filter bean for the endpoints to expose.
-    //By default; all the access is blocked by Spring Security. We grant access to the URI described below.
-    //AntPath allows to set the level of access control to the path level.
-    //Other rules can be added: hasrole, authenticated...
+    //By default; all the access is blocked by Spring Security. We grant access to the URI defined below.
+    //AntMatchers allow to set the level of access control to the path level.
+    //Other rules can be added: hasrole, authenticated.
+    // All these rules (filters) need to follow a sequential order for
+    // execution.
     //https://www.baeldung.com/spring-security-configuring-urls
 
     @Autowired
@@ -50,11 +52,10 @@ public class SecurityConfiguration {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    //TODO--add the case to fill in the login form and auto login
         return http.csrf().disable()
                 .authorizeHttpRequests(auth -> {
-                    auth.anyRequest().authenticated();
-                }).formLogin(form -> form
+                    auth.requestMatchers("/registration","/","/error").permitAll().anyRequest().authenticated();
+                }).formLogin(form -> form   //reading login : https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/form.html
                         .loginPage("/login")
                         .defaultSuccessUrl("/transactions", true) //https://www.baeldung.com/spring-redirect-after-login
                         .failureUrl("/login?error=true")
@@ -64,8 +65,6 @@ public class SecurityConfiguration {
                         .tokenValiditySeconds(86400))
                 .build();
     }
-
-    //reading login : https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/form.html
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {

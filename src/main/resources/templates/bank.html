@@ -55,7 +55,8 @@
         </div>
     </div>
     <form
-            class="text-center" method="post"
+            class="text-center"
+            method="post"
             th:object="${bank}"
             th:method="post"
     >
@@ -70,7 +71,7 @@
                         <h4>Deposit to my account</h4>
                         <p>Out of money in your account?&nbsp;</p>
                         <input type="text" th:field="*{deposit}" >
-                        <button class="btn btn-primary" type="button" th:action="@{/balance}">Deposit</button>
+                        <button class="btn btn-primary" type="submit" th:formaction="@{/balance}">Deposit</button>
                     </div>
                 </div><small class="form-text"></small>
             </div>
@@ -84,9 +85,9 @@
                         </svg></div>
                     <div class="px-3">
                         <h4>Withdraw</h4>
-                        <p><span style="color: rgba(33, 37, 41, 0.75);">Need to withdraw credit from your account?&nbsp;</span></p>
+                        <p><span style="color: rgba(33, 37, 41, 0.75);">Need to cashback?&nbsp;</span></p>
                         <input type="text" th:field="*{withdraw}">
-                        <button class="btn btn-primary" type="button" th:action="@{/withdraw}">Withdraw</button>
+                        <button class="btn btn-primary" type="submit" th:formaction="@{/withdraw}">Withdraw</button>
                     </div>
                 </div>
             </div>
@@ -96,7 +97,6 @@
     <div class="row register-form">
         <div class="w-100"></div>
     </div>
-    <script src="../../../../../../../../OneDrive%20-%20AXA/Personal/Rôles/Software%20Academy/Projets/P6/assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

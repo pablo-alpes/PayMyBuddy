@@ -15,7 +15,7 @@ import java.util.Collection;
 public interface AccountsRepository extends CrudRepository<Accounts, Integer> {
     @Transactional
     @Modifying
-    @Query(value = "UPDATE prod.accounts a SET a.balance = ?1 WHERE a.account_ID=?2", nativeQuery = true)
+    @Query(value = "UPDATE accounts a SET a.balance = ?1 WHERE a.account_ID=?2", nativeQuery = true)
     void updateBalance(float balance, int accountId);
 
     @Query(value = "select distinct a.ACCOUNT_ID from accounts a where a.CLIENT_ID = ?1", nativeQuery = true)
@@ -24,8 +24,8 @@ public interface AccountsRepository extends CrudRepository<Accounts, Integer> {
     @Query(value = "select count(CLIENT_ID) from accounts where CLIENT_ID = ?1", nativeQuery=true)
     int duplicateAccountCheck(int clientId);
 
+    @Transactional
     @Modifying
-    @jakarta.transaction.Transactional
     @Query(value="INSERT INTO accounts (" +
             "client_id, BALANCE, IBAN, SWIFT) " +
             "VALUES(:#{#clientId}, " +

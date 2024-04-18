@@ -33,7 +33,9 @@
                                 </svg>
                             </div>
                             <!-- form to request user login-->
-                            <form th:action="@{/login}" class="text-center" method="post">
+                            <form class="text-center"
+                                  th:method="post"
+                            >
                                 <div class="mb-3"><input class="form-control" type="text" name="username" placeholder="Email">
                                 </div>
                                 <div class="mb-3"><input class="form-control" type="password" name="password"
@@ -44,11 +46,14 @@
                                                                                       id="formCheck-1"><label
                                         class="form-check-label" for="formCheck-1">Remember me</label></div>
                                 <div class="mb-3">
-                                    <button class="btn btn-primary d-block w-100" type="submit"
+                                    <button class="btn btn-primary d-block w-100"
+                                            th:formaction="@{/login}"
+                                            th:method="post"
+                                            type="submit"
                                             style="padding: 5px 12px;margin: 0px;">Login
                                     </button>
                                     <nbsp><span>Not registered?</span></nbsp>
-                                    <button class="btn btn-primary d-block w-100" action="/registration" type="submit"
+                                    <button class="btn btn-primary d-block w-100" th:formaction="@{/registration}" th:formmethod="get" type="submit"
                                             style="padding: 5px 12px;margin: 0px;">Register here
                                     </button>
                                 </div>
