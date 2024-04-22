@@ -32,6 +32,10 @@ public class TransactionsController {
     @Autowired
     private BeneficiaryService beneficiaryService;
 
+
+    @Autowired
+    private AccountCreationService accountCreationService;
+
     @GetMapping(value = "/transactions")
     @ResponseBody //response body is needed to get the parameters
     public ModelAndView getTransactions(
@@ -47,10 +51,10 @@ public class TransactionsController {
         Iterable<Transactions> transactions = transactionService.getTransactionHistoryByClientId(clientID);
 
         //Identities & Balance Inputs for the Client
-        List<String> clientFirstName = clientIdentificationService.getNameById(1, clientID);
-        List<String> beneficiaryFirstName = clientIdentificationService.getNameById(2, clientID);
+        List<String> clientFirstName = clientIdentificationService.getNameById(clientID);
+        List<String> beneficiaryFirstName = beneficiaryService.getNameById(clientID);
 
-        float balance = clientIdentificationService.getBalanceById(clientID);
+        float balance = accountCreationService.getBalanceById(clientID);
 
         ModelAndView mv = new ModelAndView();
         mv.setViewName("transaction");

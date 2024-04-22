@@ -1,8 +1,7 @@
 package com.paymybudy.controller;
 
-import com.paymybudy.model.Accounts;
 import com.paymybudy.repository.BankTransaction;
-import com.paymybudy.service.ClientIdentificationService;
+import com.paymybudy.service.AccountCreationService;
 import com.paymybudy.service.LoginService;
 import com.paymybudy.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +18,13 @@ public class BankTransactionController {
     @Autowired
     private LoginService loginService;
     @Autowired
-    private ClientIdentificationService clientIdentificationService;
+    private AccountCreationService accountCreationService;
 
     @GetMapping("/bank")
     public String bankOperations(Model model, @ModelAttribute BankTransaction bank) {
         int clientID = loginService.emailToIdCurrentUser();
-        float balance = clientIdentificationService.getBalanceById(clientID);
-        String iban = clientIdentificationService.getIbanByClientId(clientID);
+        float balance = accountCreationService.getBalanceById(clientID);
+        String iban = accountCreationService.getIbanByClientId(clientID);
 
         model.addAttribute("iban", iban);
         model.addAttribute("balance", balance);
@@ -37,7 +36,7 @@ public class BankTransactionController {
     public String doWithdraw(Model model, @ModelAttribute BankTransaction bank) {
         model.addAttribute("bank", bank);
         int clientID = loginService.emailToIdCurrentUser();
-        float balance = clientIdentificationService.getBalanceById(clientID);
+        float balance = accountCreationService.getBalanceById(clientID);
         //withdraw
         transactionService.withdraw(bank, clientID);
         model.addAttribute("balance", balance);
@@ -49,7 +48,7 @@ public class BankTransactionController {
         model.addAttribute("bank", bank);
 
         int clientId = loginService.emailToIdCurrentUser();
-        float balance = clientIdentificationService.getBalanceById(clientId);
+        float balance = accountCreationService.getBalanceById(clientId);
         //updates balance and runs all the internal operations required
         transactionService.receiveDeposit(bank, clientId);
         model.addAttribute("balance", balance);

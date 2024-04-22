@@ -3,10 +3,7 @@ package com.paymybudy.service;
 import com.paymybudy.model.Accounts;
 import com.paymybudy.model.Beneficiaries;
 import com.paymybudy.model.Client;
-import com.paymybudy.repository.AccountsRepository;
 import com.paymybudy.repository.BeneficiariesRepository;
-import com.paymybudy.repository.ClientRepository;
-import jakarta.persistence.Column;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +11,13 @@ import java.util.List;
 
 @Service
 public class BeneficiaryService {
-
-    @Autowired
-    private ClientRepository clientRepository;
-
-    @Autowired
-    private AccountsRepository accountsRepository;
-
     private final BeneficiariesRepository beneficiariesRepository;
+
+    @Autowired
+    private ClientIdentificationService clientIdentificationService;
+
+    @Autowired
+    private AccountCreationService accountCreationService;
 
     public BeneficiaryService(BeneficiariesRepository beneficiariesRepository) {
         this.beneficiariesRepository = beneficiariesRepository;
@@ -31,8 +27,8 @@ public class BeneficiaryService {
         //adds the clientID as beneficiary (if already not there or updates the current one -since save is UPDATE transaction)
         Client client;
         Accounts account;
-        client = clientRepository.findById(clientId).get(); // we assume it's unique clientID
-        account = accountsRepository.findById(clientId).get();
+        client = clientIdentificationService.findById(clientId).get(); // we assume it's unique clientID
+        account = accountCreationService.findById(clientId).get();
 
         addBeneficiary(clientId, client.getFirstName(), client.getLastName(), account.getIban(), account.getSwift(), client.getEmail());
     }
@@ -61,6 +57,9 @@ public class BeneficiaryService {
         }
     } //required to be adapted to the object to the addition
 
+    public List<String> getNameById(int clientId) {
+        return findByBeneficiary_idIn(clientId);
+    }
 
     public int getBeneficiaryIdFromKeyClientIDAndBeneficiaryFirstName(int clientId, String firstName) {
         return beneficiariesRepository.getBeneficiaryIdFromKeyClientIDAndBeneficiaryFirstName(clientId, firstName);
@@ -78,6 +77,10 @@ public class BeneficiaryService {
 
     public Beneficiaries getBeneficiaryFromEmailAndClientId(String beneficiaryEmail, int clientId) {
         return beneficiariesRepository.getBeneficiaryFromEmailAndClientId(beneficiaryEmail, clientId);
+    }
+
+    public List<String> findByBeneficiary_idIn(int clientId) {
+        return beneficiariesRepository.findByBeneficiary_idIn(clientId);
     }
 }
 

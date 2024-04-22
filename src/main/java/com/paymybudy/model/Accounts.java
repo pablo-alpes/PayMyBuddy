@@ -8,7 +8,7 @@ public class Accounts {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="ACCOUNT_ID")
-    private int account_ID;
+    private int accountId;
     @Column(name="CLIENT_ID")
     private int clientId;
     @Column(name="BALANCE")
@@ -21,20 +21,20 @@ public class Accounts {
     public Accounts() {
     }
 
-    public Accounts(int account_ID, int clientId, float balance, String iban, String swift) {
-        this.account_ID = account_ID;
+    public Accounts(int accountId, int clientId, float balance, String iban, String swift) {
+        this.accountId = accountId;
         this.clientId = clientId;
         this.balance = balance;
         this.iban = iban;
         this.swift = swift;
     }
 
-    public int getAccount_ID() {
-        return account_ID;
+    public int getAccountId() {
+        return accountId;
     }
 
-    public void setAccount_ID(int account_ID) {
-        this.account_ID = account_ID;
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
 
     public int getClientId() {

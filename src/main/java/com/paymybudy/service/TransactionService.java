@@ -1,11 +1,7 @@
 package com.paymybudy.service;
 
-import com.paymybudy.model.Accounts;
-import com.paymybudy.model.Client;
 import com.paymybudy.model.Transactions;
-import com.paymybudy.repository.AccountsRepository;
 import com.paymybudy.repository.BankTransaction;
-import com.paymybudy.repository.ClientRepository;
 import com.paymybudy.repository.TransactionRepository;
 import com.paymybudy.view.Page;
 import com.paymybudy.view.Paged;
@@ -13,10 +9,8 @@ import com.paymybudy.view.Paging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -33,21 +27,17 @@ public class TransactionService {
     private BeneficiaryService beneficiaryService;
 
     @Autowired
-    private ClientRepository clientRepository;
-
-    @Autowired
-    private AccountsRepository accountsRepository;
+    private ClientIdentificationService clientIdentificationService;
 
     public int doTransfer(Transactions transaction) {
         //Check balance
         float balance = balanceService.getBalance(transaction.getClientId());
-        if (balanceService.validOperation(balance, transaction.getAmount()) == true) {
+        if (balanceService.validOperation(balance, transaction.getAmount())) {
             //Update Balance
             balanceService.updateBalance(transaction.getClientId(), balance - transaction.getAmount());
             transactionRepository.save(transaction);
             return 1;
-        }
-        else {
+        } else {
             return 0;
         }
     }
@@ -81,31 +71,31 @@ public class TransactionService {
         float balance = balanceService.getBalance(clientId);
         float totalOperation = balance + balanceToDeposit;
 
-            //creates beneficiary if it doesn't exist, otherwise is updated
-            beneficiaryService.addMirrorBeneficiary(clientId);
-            String firstName = clientRepository.findById(clientId).get().getFirstName();
-            int beneficiaryId = beneficiaryService.getBeneficiaryIdFromKeyClientIDAndBeneficiaryFirstName(clientId, firstName);
+        //creates beneficiary if it doesn't exist, otherwise is updated
+        beneficiaryService.addMirrorBeneficiary(clientId);
+        final String firstName = clientIdentificationService.findById(clientId).get().getFirstName();
+        int beneficiaryId = beneficiaryService.getBeneficiaryIdFromKeyClientIDAndBeneficiaryFirstName(clientId, firstName);
 
-            //Destination Beneficiary - We proceed then to complete the transaction with destination beneficiary
-            transaction.setClientId(clientId);
-            transaction.setBeneficiaryId(beneficiaryId);
-            transaction.setDate(new Date()); // date now
-            transaction.setAmount(balanceToDeposit);
-            transaction.setDescription("Credit deposit from User");
-            transaction.setStatus(1);
-            transaction.setBeneficiaryName(firstName);
+        //Destination Beneficiary - We proceed then to complete the transaction with destination beneficiary
+        transaction.setClientId(clientId);
+        transaction.setBeneficiaryId(beneficiaryId);
+        transaction.setDate(new Date()); // date now
+        transaction.setAmount(balanceToDeposit);
+        transaction.setDescription("Credit deposit from User");
+        transaction.setStatus(1);
+        transaction.setBeneficiaryName(firstName);
 
-            //transaction is recorded
-            transactionRepository.save(transaction);
-            //balance is updated
-            balanceService.updateBalance(clientId, totalOperation);
+        //transaction is recorded
+        transactionRepository.save(transaction);
+        //balance is updated
+        balanceService.updateBalance(clientId, totalOperation);
 
     }
 
     public void withdraw(BankTransaction bank, int clientId) {
         //creates beneficiary if it doesn't exist, otherwise is updated
         beneficiaryService.addMirrorBeneficiary(clientId);
-        String firstName = clientRepository.findById(clientId).get().getFirstName();
+        final String firstName = clientIdentificationService.findById(clientId).get().getFirstName();
 
         int beneficiaryId = beneficiaryService.getBeneficiaryIdFromKeyClientIDAndBeneficiaryFirstName(clientId, firstName);
 

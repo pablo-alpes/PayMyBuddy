@@ -1,13 +1,14 @@
 package com.paymybudy;
 
+import com.paymybudy.configuration.SecurityConfiguration;
 import com.paymybudy.model.Accounts;
 import com.paymybudy.model.Beneficiaries;
 import com.paymybudy.model.Client;
 import com.paymybudy.model.Transactions;
 import com.paymybudy.repository.*;
 import com.paymybudy.service.*;
-import jakarta.persistence.Column;
 import jakarta.servlet.ServletException;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,13 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -73,6 +74,7 @@ class OcPayMyBuddyApplicationTests {
     }
 
     @Nested
+    @Component
     class endpoints
     {
         @Autowired
@@ -270,7 +272,7 @@ class OcPayMyBuddyApplicationTests {
         @WithUserDetails
             // by default 'user'
         void test_POST_EndPoint6_Registration_UP() throws Exception {
-            this.mockMvc
+            MvcResult mvcResult = this.mockMvc
                     .perform(post("/registration")
                             .param("firstName", "test")
                             .param("lastName", "test")
@@ -279,7 +281,10 @@ class OcPayMyBuddyApplicationTests {
                             .param("email", "email@test.com")
                             .param("password", "passwordTest"))
                     .andExpect(status().is2xxSuccessful())
-                    .andExpect(model().attributeExists("client"));
+                    .andExpect(model().attributeExists("client"))
+                    .andReturn();
+
+            assertTrue(mvcResult.getRequest().getParameter("password").toString().equals("passwordTest"));
         }
 
         @Test
@@ -300,7 +305,7 @@ class OcPayMyBuddyApplicationTests {
                     .andExpect(model().attributeExists("registrationAddFormDTO"))
                     .andReturn();
             //Then: Value is well passed to the POST form. We check for one of latest as is sequentially added.
-            assertEquals((mvcResult.getRequest().getParameter("email")), "email@test.com");
+            assertEquals((mvcResult.getRequest().getParameter("password")), "passwordtest");
         }
 
 
@@ -341,6 +346,7 @@ class OcPayMyBuddyApplicationTests {
 
     }
     @Nested
+    @Transactional
     class db {
         @Test
         @DisplayName("Beneficiary Record stored")
@@ -458,6 +464,8 @@ class OcPayMyBuddyApplicationTests {
     }
 
     @Nested
+    @Component
+    @Transactional
     class security {
         @Autowired
         private MockMvc mockMvc;
@@ -514,7 +522,7 @@ class OcPayMyBuddyApplicationTests {
          */
 
         @Test
-        @DisplayName("Unit test create client")
+        @DisplayName("IT create client")
         void test_creationClient() throws Exception {
             //Given
             Client client = new Client();
@@ -523,7 +531,7 @@ class OcPayMyBuddyApplicationTests {
             client.setFirstName("test");
             client.setLastName("test");
             client.setPassword("test");
-            client.setEmail("email@test.com");
+            client.setEmail("test@tester.com");
             client.setRole("USER"); // by default all persons are 'USER'
 
             accountCreationService.createClient(client); // records the client user
@@ -533,9 +541,9 @@ class OcPayMyBuddyApplicationTests {
         }
 
         @Test
-        @DisplayName("Unit test create account")
-        void test_creationAccount() throws Exception {
-            //the person needs to have previously created a client account
+        @DisplayName("IT create account")
+        void test_creationAccount() {
+            //the person needs to have previously created a client account, we take "user"
             Accounts account = new Accounts();
 
             account.setBalance(0); //by default clients do not have money in the account // à intégrer dans la méthode
@@ -544,7 +552,7 @@ class OcPayMyBuddyApplicationTests {
 
             int before = (int) accountsRepository.count();
             //la valeur username viendra du wrapper AddFormDTO
-            accountCreationService.createAccount("email@test.com", account.getIban(), account.getSwift()); // creates the account
+            accountCreationService.createAccount("francesco.martelli@gmail.com", account.getIban(), account.getSwift()); // creates the account
 
             //ASSERT
             assertNotEquals(accountsRepository.count(), before);
@@ -610,6 +618,35 @@ class OcPayMyBuddyApplicationTests {
             assertNotEquals(savedTransaction.getTransactionId(), 0);
             assertEquals(savedTransaction.getAmount(), withdraw);
         }
+
+        @Test
+        @DisplayName("Decrypted password matching for a new user")
+        void test_GIVENnewUserRegister_WHENPasswordEncodedByBcrypt_THENMatchesLoginStoredPassword() {
+            //arrange
+            SecurityConfiguration securityConfiguration = new SecurityConfiguration();
+
+            //act
+            String encriptedPassword = securityConfiguration.passwordEncoder().encode("test");
+            String password = "test";
+
+            //assert
+            assertTrue(securityConfiguration.passwordEncoder().matches(password,encriptedPassword));
+        }
+
+        @Test
+        @DisplayName("Fail - Decrypted password non matching registered one")
+        void test_GIVENStoragedPasswordInDb_WHENMatchCheck_THENRawPasswordNotMatchesWithEncodedOne() {
+            //arrange
+            SecurityConfiguration securityConfiguration = new SecurityConfiguration();
+
+            //act
+            String password = ",password";
+            String encriptedPassword = "$2a$10$YXYinPAMn6MSeDoaaEQ.WOX7fp8B5TopQ5N7LiEDAeZXmjZ9ZV6vu";
+
+            //assert
+            assertFalse(securityConfiguration.passwordEncoder().matches(password,encriptedPassword));
+        }
+
 
     }
 
