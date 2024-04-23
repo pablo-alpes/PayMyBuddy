@@ -1,5 +1,6 @@
 package com.paymybudy.constants;
 
 public class Constants {
-    final public static String INITIALIZER = "/src/main/resources/initializer.sql";
+    final public static String ITEMS_PER_PAGE = "5";
+
 }
