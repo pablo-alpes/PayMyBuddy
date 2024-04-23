@@ -26,19 +26,7 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String doRegistration(@ModelAttribute RegistrationAddFormDTO clientDTO, Model model) {
         model.addAttribute("client", clientDTO);
-
-        Client client = new Client();
-        Accounts account = new Accounts();
-
-        client.setFirstName(clientDTO.getFirstName());
-        client.setLastName(clientDTO.getLastName());
-        client.setPassword(clientDTO.getPassword());
-        client.setEmail(clientDTO.getEmail());
-        accountCreationService.createClient(client); // records the client user, by default client ID assigned by DB
-
-        account.setIban(clientDTO.getIban());
-        account.setSwift(clientDTO.getSwift());
-        accountCreationService.createAccount(clientDTO.getEmail(), account.getIban(), account.getSwift()); // creates the account, by default balance = 0
+        accountCreationService.doUserRegistration(clientDTO);
 
         return "login";
     }

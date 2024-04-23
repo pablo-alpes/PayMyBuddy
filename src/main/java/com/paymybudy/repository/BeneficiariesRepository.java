@@ -23,7 +23,17 @@ public interface BeneficiariesRepository  extends CrudRepository<Beneficiaries, 
     @Query(value = "select COUNT(distinct beneficiary_id) from beneficiaries where client_id = ?1 and email = ?2", nativeQuery = true)
     int TimesBeneficiaryForClientID(int clientId, String email); //needs to be only 1 as email is only allowed once
 
-    @Query(value = "select b.email from Beneficiaries b where b.client_id <> ?1", nativeQuery = true)
+    @Query(value = "SELECT d.email\n" +
+            "FROM\n" +
+            "    (SELECT email\n" +
+            "     FROM beneficiaries\n" +
+            "     WHERE client_id = ?1) c\n" +
+            "        RIGHT OUTER JOIN\n" +
+            "    (SELECT email\n" +
+            "     FROM beneficiaries\n" +
+            "     WHERE client_id <> ?1) d\n" +
+            "    ON c.email = d.email\n" +
+            "where c.email is null;", nativeQuery = true)
     List<String> getBeneficiaryEmailByClientId(int clientId);
 
     @Query(value = "select * from beneficiaries where email = ?1 limit 1", nativeQuery = true)

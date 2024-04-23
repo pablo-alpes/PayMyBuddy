@@ -36,35 +36,13 @@ public class NewBeneficiaryController {
     }
 
     @PostMapping("/newconnection")
-    public void newBeneficiaryInput(@ModelAttribute BeneficiaryAddFormDTO beneficiaryAddForm, Model model) throws NullPointerException {
+    public void newBeneficiaryInput(@ModelAttribute BeneficiaryAddFormDTO beneficiaryAddForm, Model model) throws Exception {
         //storages the information obtained in the Form to the DB
 
-        //if user input
-        int clientID = loginService.emailToIdCurrentUser();
+        int clientID = loginService.emailToIdCurrentUser(); //if user input
         model.addAttribute("beneficiaryAddForm", beneficiaryAddForm);
-
-        //if email is selected :
-        try {
-            if (beneficiaryAddForm.getSelectedEmail() != null) {
-                String beneficiaryEmail = beneficiaryAddForm.getSelectedEmail();
-                Beneficiaries beneficiaryFromEmail = beneficiaryService.getBeneficiaryFromEmailAndClientId(beneficiaryEmail, clientID);
-                beneficiaryService.addExistingBeneficiaryToClientId(beneficiaryFromEmail, clientID);
-            }
-        }
-        catch(NullPointerException e) {
-            //if and user enters an input --
-            // TODO--block the template to avoid blank page
-            if (beneficiaryAddForm.getBeneficiaries().getEmail().length() > 1) { //checks if email is valid
-                beneficiaryService.addBeneficiary(
-                        clientID,
-                        beneficiaryAddForm.getBeneficiaries().getBeneficiaryFirstName(),
-                        beneficiaryAddForm.getBeneficiaries().getBeneficiaryLastName(),
-                        beneficiaryAddForm.getBeneficiaries().getIban(),
-                        beneficiaryAddForm.getBeneficiaries().getSwift(),
-                        beneficiaryAddForm.getBeneficiaries().getEmail());
-            }
-            model.addAttribute("message", "Registration of new connection has been successful.");
-        }
+        beneficiaryService.newConnection(beneficiaryAddForm, clientID);
+        model.addAttribute("message", "Registration of new connection has been successful.");
     }
 
 }

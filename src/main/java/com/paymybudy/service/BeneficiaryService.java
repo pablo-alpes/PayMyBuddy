@@ -4,6 +4,8 @@ import com.paymybudy.model.Accounts;
 import com.paymybudy.model.Beneficiaries;
 import com.paymybudy.model.Client;
 import com.paymybudy.repository.BeneficiariesRepository;
+import com.paymybudy.repository.BeneficiaryAddFormDTO;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +38,7 @@ public class BeneficiaryService {
 
     public void addBeneficiary(int clientID, String firstName, String lastName, String iban, String swift, String email) {
         //Rules : An unique mail for the key firstName-lastName is accepted
-        if (TimesBeneficiaryForClientID(clientID, email)==0) { //checks if no duplication of beneficiary record
+        if (TimesBeneficiaryForClientID(clientID, email) == 0) { //checks if no duplication of beneficiary record
             Beneficiaries beneficiary = new Beneficiaries();
 
             //values of the beneficiary to add -- beneficiary Id is autoincremented
@@ -51,11 +53,35 @@ public class BeneficiaryService {
             beneficiariesRepository.save(beneficiary);
         }
     }
+
     public void addExistingBeneficiaryToClientId(Beneficiaries beneficiary, int clientId) {
-        if (TimesBeneficiaryForClientID(clientId, beneficiary.getEmail())==0) { //checks if no duplication of beneficiary record
+        if (TimesBeneficiaryForClientID(clientId, beneficiary.getEmail()) == 0) { //checks if no duplication of beneficiary record
             beneficiariesRepository.saveBeneficiaryForClientId(beneficiary, clientId);
         }
     } //required to be adapted to the object to the addition
+
+    public void newConnection(BeneficiaryAddFormDTO beneficiaryAddForm, int clientID) throws Exception {
+        //if an email is selected in the dropbox
+        try {
+            if (beneficiaryAddForm.getSelectedEmail() != null) {
+                String beneficiaryEmail = beneficiaryAddForm.getSelectedEmail();
+                Beneficiaries beneficiaryFromEmail = getBeneficiaryFromEmailAndClientId(beneficiaryEmail, clientID);
+                addExistingBeneficiaryToClientId(beneficiaryFromEmail, clientID);
+            }
+        } catch (NullPointerException e) {
+            //if a user enters an input
+            if (beneficiaryAddForm.getBeneficiaries().getEmail().length() > 1) { //checks if email is valid
+                addBeneficiary(
+                        clientID,
+                        beneficiaryAddForm.getBeneficiaries().getBeneficiaryFirstName(),
+                        beneficiaryAddForm.getBeneficiaries().getBeneficiaryLastName(),
+                        beneficiaryAddForm.getBeneficiaries().getIban(),
+                        beneficiaryAddForm.getBeneficiaries().getSwift(),
+                        beneficiaryAddForm.getBeneficiaries().getEmail());
+            }
+        }
+    }
+
 
     public List<String> getNameById(int clientId) {
         return findByBeneficiary_idIn(clientId);

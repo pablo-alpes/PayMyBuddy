@@ -4,6 +4,7 @@ import com.paymybudy.configuration.SecurityConfiguration;
 import com.paymybudy.model.Accounts;
 import com.paymybudy.model.Client;
 import com.paymybudy.repository.AccountsRepository;
+import com.paymybudy.repository.RegistrationAddFormDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,23 @@ public class AccountCreationService {
         if (accountsRepository.duplicateAccountCheck(clientId) == 0){ //the person needs to have previously created a client account
             accountsRepository.saveAccount(account, clientId);
         }
+
+    }
+
+    public void doUserRegistration(RegistrationAddFormDTO clientDTO) {
+
+        Client client = new Client();
+        Accounts account = new Accounts();
+
+        client.setFirstName(clientDTO.getFirstName());
+        client.setLastName(clientDTO.getLastName());
+        client.setPassword(clientDTO.getPassword());
+        client.setEmail(clientDTO.getEmail());
+        createClient(client); // records the client user, by default client ID assigned by DB
+
+        account.setIban(clientDTO.getIban());
+        account.setSwift(clientDTO.getSwift());
+        createAccount(clientDTO.getEmail(), account.getIban(), account.getSwift()); // creates the account, by default balance = 0
 
     }
 
